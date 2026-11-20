@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Calculatrice</title>
+  <title>Calculatrice Scientifique</title>
 </head>
 <body>
 
@@ -18,6 +18,13 @@
 
     <!-- Pavé numérique et opérateurs -->
     <table>
+      <!-- Nouvelle rangée : fonctions scientifiques -->
+      <tr>
+        <td><button type="button">(</button></td>
+        <td><button type="button">)</button></td>
+        <td><button type="button">√</button></td>
+        <td><button type="button">x²</button></td>
+      </tr>
       <tr>
         <td><button type="button">C</button></td>
         <td><button type="button">CE</button></td>
@@ -48,6 +55,17 @@
         <td><button type="button">=</button></td>
       </tr>
     </table>
+
+    <br>
+
+    <!-- Nouvelle section : Historique des opérations -->
+    <section>
+      <h2>Historique</h2>
+      <ul id="historique">
+        <li>Aucun calcul récent</li>
+      </ul>
+      <button type="button">Effacer l'historique</button>
+    </section>
   </main>
 
 </body>
