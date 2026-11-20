@@ -3,21 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculatrice Scientifique</title>
+  <title>Calculatrice Scientifique Pro</title>
   <style>
     :root {
-      --bg: #121212;
-      --surface: #1e1e1e;
-      --btn: #2d2d2d;
-      --btn-hover: #3d3d3d;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --screen-bg: #0b1120;
+      --btn: #334155;
+      --btn-hover: #475569;
+      --btn-sci: #263345;
       --accent: #3b82f6;
       --accent-hover: #2563eb;
       --danger: #ef4444;
-      --text: #f3f4f6;
-      --text-muted: #9ca3af;
+      --success: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
     }
 
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
 
     body {
       background-color: var(--bg);
@@ -33,8 +37,8 @@
     main {
       display: flex;
       flex-wrap: wrap;
-      gap: 2rem;
-      max-width: 720px;
+      gap: 1.5rem;
+      max-width: 820px;
       width: 100%;
       justify-content: center;
     }
@@ -42,35 +46,93 @@
     .calculatrice, .historique-panel {
       background-color: var(--surface);
       padding: 1.5rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
     }
 
-    .calculatrice { width: 340px; }
-    .historique-panel { flex: 1; min-width: 260px; display: flex; flex-direction: column; }
+    .calculatrice { width: 380px; }
+    .historique-panel { flex: 1; min-width: 280px; display: flex; flex-direction: column; }
 
-    h1, h2 { margin-top: 0; font-size: 1.25rem; font-weight: 600; }
+    .header-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
 
-    /* Écran d'affichage */
+    h1, h2 { margin: 0; font-size: 1.15rem; font-weight: 600; letter-spacing: 0.02em; }
+
+    .badge-mode {
+      font-size: 0.75rem;
+      background: var(--btn-sci);
+      color: var(--text-muted);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    .badge-mode:hover { color: var(--text); border-color: var(--accent); }
+
+    /* Bloc Écran à double affichage */
+    .ecran-container {
+      position: relative;
+      background-color: var(--screen-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+    }
+
+    #expression-precedente {
+      width: 100%;
+      min-height: 1.2rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: right;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-right: 2rem;
+    }
+
     #ecran {
       width: 100%;
-      height: 64px;
-      background-color: var(--bg);
+      background: transparent;
       color: var(--text);
-      border: 1px solid #333;
-      border-radius: 10px;
-      font-size: 1.75rem;
+      border: none;
+      font-size: 1.85rem;
+      font-weight: 600;
       text-align: right;
-      padding: 0 1rem;
-      margin-bottom: 1rem;
+      padding: 0;
+      outline: none;
       font-variant-numeric: tabular-nums;
     }
 
-    /* Grille de boutons (remplace le <table>) */
+    .btn-copier {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.6rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      padding: 0.25rem 0.45rem;
+      height: auto;
+      border-radius: 6px;
+    }
+    .btn-copier:hover { background: var(--btn); color: var(--text); }
+    .btn-copier.copie { color: var(--success); }
+
+    /* Grille de boutons (5 colonnes pour le mode scientifique) */
     .clavier {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
     }
 
     button {
@@ -78,18 +140,20 @@
       color: var(--text);
       border: none;
       border-radius: 10px;
-      height: 52px;
-      font-size: 1.15rem;
+      height: 48px;
+      font-size: 1.05rem;
       cursor: pointer;
-      transition: background-color 0.15s, transform 0.05s;
+      transition: background-color 0.12s, transform 0.06s;
+      user-select: none;
     }
 
     button:hover { background-color: var(--btn-hover); }
-    button:active { transform: scale(0.96); }
+    button:active, button.actif-clavier { transform: scale(0.94); background-color: var(--btn-hover); }
 
-    .btn-op { color: #60a5fa; font-weight: 600; }
+    .btn-sci { background-color: var(--btn-sci); color: #cbd5e1; font-size: 0.95rem; }
+    .btn-op { color: #60a5fa; font-weight: 600; font-size: 1.2rem; }
     .btn-clear { color: var(--danger); font-weight: 600; }
-    .btn-egal { background-color: var(--accent); font-weight: bold; }
+    .btn-egal { background-color: var(--accent); font-weight: bold; font-size: 1.25rem; }
     .btn-egal:hover { background-color: var(--accent-hover); }
     .span-2 { grid-column: span 2; }
 
@@ -99,27 +163,46 @@
       padding: 0;
       margin: 0 0 1rem 0;
       flex: 1;
-      max-height: 310px;
+      max-height: 365px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
     #historique li {
       padding: 0.6rem 0.75rem;
-      border-bottom: 1px solid #2e2e2e;
-      font-size: 0.95rem;
+      background-color: rgba(15, 23, 42, 0.45);
+      border: 1px solid transparent;
+      border-radius: 8px;
       cursor: pointer;
-      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      transition: border-color 0.15s, background-color 0.15s;
     }
 
-    #historique li:hover:not(.vide) { background-color: var(--btn); }
-    #historique li.vide { color: var(--text-muted); cursor: default; }
+    #historique li:hover:not(.vide) {
+      background-color: var(--btn-sci);
+      border-color: var(--border);
+    }
+
+    #historique li .hist-expr { font-size: 0.8rem; color: var(--text-muted); }
+    #historique li .hist-res { font-size: 1.05rem; font-weight: 600; color: #60a5fa; }
+    #historique li.vide {
+      align-items: center;
+      color: var(--text-muted);
+      background: transparent;
+      cursor: default;
+      padding: 2rem 0;
+    }
 
     .btn-reset-hist {
       width: 100%;
       height: 40px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       background-color: transparent;
-      border: 1px solid #3f3f46;
+      border: 1px solid var(--border);
       color: var(--text-muted);
     }
     .btn-reset-hist:hover { border-color: var(--danger); color: var(--danger); background: transparent; }
@@ -129,49 +212,75 @@
 
   <main>
     <!-- Bloc Calculatrice -->
-    <section class="calculatrice" aria-label="Calculatrice">
-      <h1>Calculatrice</h1>
+    <section class="calculatrice" aria-label="Calculatrice Scientifique">
+      <div class="header-panel">
+        <h1>Calculatrice</h1>
+        <span class="badge-mode" id="toggle-angle" title="Basculer Degrés / Radians">DEG</span>
+      </div>
 
-      <input type="text" id="ecran" name="ecran" value="0" aria-label="Écran de résultat" readonly>
+      <div class="ecran-container">
+        <button type="button" class="btn-copier" id="btn-copier" title="Copier le résultat">Copier</button>
+        <div id="expression-precedente" aria-live="polite"></div>
+        <input type="text" id="ecran" name="ecran" value="0" aria-label="Écran de résultat" readonly>
+      </div>
 
       <div class="clavier" id="clavier">
-        <!-- Fonctions scientifiques -->
-        <button type="button" class="btn-op" data-val="(">(</button>
-        <button type="button" class="btn-op" data-val=")">)</button>
-        <button type="button" class="btn-op" data-action="sqrt">√</button>
-        <button type="button" class="btn-op" data-action="pow2">x²</button>
+        <!-- Ligne 1 : Trigonométrie & Constantes -->
+        <button type="button" class="btn-sci" data-func="sin">sin</button>
+        <button type="button" class="btn-sci" data-func="cos">cos</button>
+        <button type="button" class="btn-sci" data-func="tan">tan</button>
+        <button type="button" class="btn-sci" data-val="π">π</button>
+        <button type="button" class="btn-clear" data-action="clear-all" data-key="Escape">C</button>
 
-        <!-- Effacement et pourcentage -->
-        <button type="button" class="btn-clear" data-action="clear-all">C</button>
-        <button type="button" class="btn-clear" data-action="backspace">CE</button>
-        <button type="button" class="btn-op" data-val="%">%</button>
-        <button type="button" class="btn-op" data-val="/">÷</button>
+        <!-- Ligne 2 : Puissances, Racines & Effacement -->
+        <button type="button" class="btn-sci" data-func="ln">ln</button>
+        <button type="button" class="btn-sci" data-func="sqrt">√</button>
+        <button type="button" class="btn-sci" data-func="pow2">x²</button>
+        <button type="button" class="btn-sci" data-val="^">xʸ</button>
+        <button type="button" class="btn-clear" data-action="backspace" data-key="Backspace">⌫</button>
 
-        <!-- Pavé numérique -->
-        <button type="button" data-val="7">7</button>
-        <button type="button" data-val="8">8</button>
-        <button type="button" data-val="9">9</button>
-        <button type="button" class="btn-op" data-val="*">×</button>
+        <!-- Ligne 3 : Parenthèses, Pourcentage & Division -->
+        <button type="button" class="btn-sci" data-val="(" data-key="(">(</button>
+        <button type="button" class="btn-sci" data-val=")" data-key=")">)</button>
+        <button type="button" class="btn-sci" data-val="%" data-key="%">%</button>
+        <button type="button" class="btn-sci" data-val="e">e</button>
+        <button type="button" class="btn-op" data-val="/" data-key="/">÷</button>
 
-        <button type="button" data-val="4">4</button>
-        <button type="button" data-val="5">5</button>
-        <button type="button" data-val="6">6</button>
-        <button type="button" class="btn-op" data-val="-">−</button>
+        <!-- Ligne 4 -->
+        <button type="button" data-val="7" data-key="7">7</button>
+        <button type="button" data-val="8" data-key="8">8</button>
+        <button type="button" data-val="9" data-key="9">9</button>
+        <button type="button" class="btn-sci" data-func="inv">1/x</button>
+        <button type="button" class="btn-op" data-val="*" data-key="*">×</button>
 
-        <button type="button" data-val="1">1</button>
-        <button type="button" data-val="2">2</button>
-        <button type="button" data-val="3">3</button>
-        <button type="button" class="btn-op" data-val="+">+</button>
+        <!-- Ligne 5 -->
+        <button type="button" data-val="4" data-key="4">4</button>
+        <button type="button" data-val="5" data-key="5">5</button>
+        <button type="button" data-val="6" data-key="6">6</button>
+        <button type="button" class="btn-sci" data-func="fact">n!</button>
+        <button type="button" class="btn-op" data-val="-" data-key="-">−</button>
 
-        <button type="button" class="span-2" data-val="0">0</button>
-        <button type="button" data-val=".">.</button>
-        <button type="button" class="btn-egal" data-action="eval">=</button>
+        <!-- Ligne 6 -->
+        <button type="button" data-val="1" data-key="1">1</button>
+        <button type="button" data-val="2" data-key="2">2</button>
+        <button type="button" data-val="3" data-key="3">3</button>
+        <button type="button" class="btn-sci" data-func="neg">±</button>
+        <button type="button" class="btn-op" data-val="+" data-key="+">+</button>
+
+        <!-- Ligne 7 -->
+        <button type="button" class="span-2" data-val="0" data-key="0">0</button>
+        <button type="button" data-val="." data-key=".">.</button>
+        <button type="button" class="btn-sci" id="btn-ans">Ans</button>
+        <button type="button" class="btn-egal" data-action="eval" data-key="Enter">=</button>
       </div>
     </section>
 
     <!-- Bloc Historique -->
     <section class="historique-panel" aria-label="Historique des opérations">
-      <h2>Historique</h2>
+      <div class="header-panel">
+        <h2>Historique</h2>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">Cliquer pour réutiliser</span>
+      </div>
       <ul id="historique">
         <li class="vide">Aucun calcul récent</li>
       </ul>
@@ -181,4 +290,238 @@
 
   <script>
     const ecran = document.getElementById('ecran');
-    const clavier
+    const exprPrecedente = document.getElementById('expression-precedente');
+    const clavier = document.getElementById('clavier');
+    const listeHistorique = document.getElementById('historique');
+    const btnEffacerHist = document.getElementById('btn-effacer-hist');
+    const toggleAngle = document.getElementById('toggle-angle');
+    const btnCopier = document.getElementById('btn-copier');
+    const btnAns = document.getElementById('btn-ans');
+
+    let expression = '';
+    let dernierResultat = 0;
+    let modeDegres = true;
+    let vientDeCalculer = false;
+    let historiqueData = JSON.parse(localStorage.getItem('calc_historique') || '[]');
+
+    // Initialisation de l'historique sauvegardé
+    afficherHistorique();
+
+    // Bascule Degrés / Radians
+    toggleAngle.addEventListener('click', () => {
+      modeDegres = !modeDegres;
+      toggleAngle.textContent = modeDegres ? 'DEG' : 'RAD';
+    });
+
+    // Copier le résultat
+    btnCopier.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(ecran.value);
+        btnCopier.textContent = 'Copié !';
+        btnCopier.classList.add('copie');
+        setTimeout(() => {
+          btnCopier.textContent = 'Copier';
+          btnCopier.classList.remove('copie');
+        }, 1500);
+      } catch { /* Ignorer si bloqué par le navigateur */ }
+    });
+
+    // Bouton Ans (réinjecte le dernier résultat)
+    btnAns.addEventListener('click', () => {
+      ajouterValeur(String(dernierResultat));
+    });
+
+    function majEcran(texte) {
+      ecran.value = texte || '0';
+    }
+
+    function ajouterValeur(val) {
+      if (vientDeCalculer && /[0-9.(πe]/.test(val)) {
+        expression = '';
+        exprPrecedente.textContent = `Ans = ${dernierResultat}`;
+      }
+      vientDeCalculer = false;
+
+      // Multiplication implicite : ex. 2π -> 2*π ou 2(3) -> 2*(3)
+      if (/[0-9)πe]$/.test(expression) && /^[πe(]/.test(val)) {
+        expression += '*';
+      }
+
+      expression += val;
+      majEcran(expression);
+    }
+
+    function preparerExpression(expr) {
+      return expr
+        .replace(/π/g, `(${Math.PI})`)
+        .replace(/\be\b/g, `(${Math.E})`)
+        .replace(/\^/g, '**')
+        .replace(/(\d+(\.\d+)?)%/g, '($1/100)');
+    }
+
+    function evaluerBrut(expr) {
+      const prete = preparerExpression(expr);
+      if (!/^[0-9+\-*/.%() ]+$/.test(prete)) throw new Error('Caractères invalides');
+      const res = Function('"use strict"; return (' + prete + ')')();
+      if (!Number.isFinite(res)) throw new Error('Erreur mathématique');
+      return Math.round(res * 1e10) / 1e10;
+    }
+
+    function calculer() {
+      if (!expression) return;
+      try {
+        const resultat = evaluerBrut(expression);
+        exprPrecedente.textContent = `${expression} =`;
+        enregistrerHistorique(expression, resultat);
+        dernierResultat = resultat;
+        expression = String(resultat);
+        majEcran(expression);
+        vientDeCalculer = true;
+      } catch {
+        exprPrecedente.textContent = expression;
+        majEcran('Erreur');
+        expression = '';
+        vientDeCalculer = true;
+      }
+    }
+
+    function factorielle(n) {
+      if (n < 0 || !Number.isInteger(n) || n > 170) throw new Error();
+      let r = 1;
+      for (let i = 2; i <= n; i++) r *= i;
+      return r;
+    }
+
+    function appliquerFonction(func) {
+      try {
+        const val = expression ? evaluerBrut(expression) : 0;
+        const rad = modeDegres ? (val * Math.PI) / 180 : val;
+        let res;
+        let libelle;
+
+        switch (func) {
+          case 'sqrt':
+            if (val < 0) throw new Error();
+            res = Math.sqrt(val);
+            libelle = `√(${val})`;
+            break;
+          case 'pow2':
+            res = Math.pow(val, 2);
+            libelle = `(${val})²`;
+            break;
+          case 'inv':
+            if (val === 0) throw new Error();
+            res = 1 / val;
+            libelle = `1/(${val})`;
+            break;
+          case 'fact':
+            res = factorielle(val);
+            libelle = `${val}!`;
+            break;
+          case 'neg':
+            res = -val;
+            libelle = `-(${val})`;
+            break;
+          case 'sin':
+            res = Math.sin(rad);
+            libelle = `sin(${val}${modeDegres ? '°' : ''})`;
+            break;
+          case 'cos':
+            res = Math.cos(rad);
+            libelle = `cos(${val}${modeDegres ? '°' : ''})`;
+            break;
+          case 'tan':
+            if (modeDegres && Math.abs(val % 180) === 90) throw new Error();
+            res = Math.tan(rad);
+            libelle = `tan(${val}${modeDegres ? '°' : ''})`;
+            break;
+          case 'ln':
+            if (val <= 0) throw new Error();
+            res = Math.log(val);
+            libelle = `ln(${val})`;
+            break;
+        }
+
+        const resArrondi = Math.round(res * 1e10) / 1e10;
+        exprPrecedente.textContent = `${libelle} =`;
+        enregistrerHistorique(libelle, resArrondi);
+        dernierResultat = resArrondi;
+        expression = String(resArrondi);
+        majEcran(expression);
+        vientDeCalculer = true;
+      } catch {
+        majEcran('Erreur');
+        expression = '';
+        vientDeCalculer = true;
+      }
+    }
+
+    function enregistrerHistorique(calcul, resultat) {
+      historiqueData.unshift({ calcul, resultat });
+      if (historiqueData.length > 30) historiqueData.pop();
+      localStorage.setItem('calc_historique', JSON.stringify(historiqueData));
+      afficherHistorique();
+    }
+
+    function afficherHistorique() {
+      listeHistorique.innerHTML = '';
+      if (historiqueData.length === 0) {
+        listeHistorique.innerHTML = '<li class="vide">Aucun calcul récent</li>';
+        return;
+      }
+
+      historiqueData.forEach(({ calcul, resultat }) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="hist-expr">${calcul} =</span><span class="hist-res">${resultat}</span>`;
+        li.addEventListener('click', () => {
+          expression = String(resultat);
+          exprPrecedente.textContent = `Repris : ${calcul}`;
+          majEcran(expression);
+          vientDeCalculer = false;
+        });
+        listeHistorique.appendChild(li);
+      });
+    }
+
+    clavier.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+
+      const { val, action, func } = btn.dataset;
+      if (val) ajouterValeur(val);
+      else if (func) appliquerFonction(func);
+      else if (action === 'eval') calculer();
+      else if (action === 'clear-all') {
+        expression = '';
+        exprPrecedente.textContent = '';
+        majEcran('0');
+      } else if (action === 'backspace') {
+        expression = expression.slice(0, -1);
+        majEcran(expression);
+      }
+    });
+
+    btnEffacerHist.addEventListener('click', () => {
+      historiqueData = [];
+      localStorage.removeItem('calc_historique');
+      afficherHistorique();
+    });
+
+    // Support clavier physique + animation visuelle de la touche correspondante
+    document.addEventListener('keydown', (e) => {
+      const touche = e.key === '=' ? 'Enter' : e.key;
+      const btnAssocie = clavier.querySelector(`button[data-key="${CSS.escape(touche)}"]`);
+      if (btnAssocie) {
+        btnAssocie.classList.add('actif-clavier');
+        setTimeout(() => btnAssocie.classList.remove('actif-clavier'), 120);
+      }
+
+      if (/^[0-9+\-*/.%()^]$/.test(e.key)) ajouterValeur(e.key);
+      else if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); calculer(); }
+      else if (e.key === 'Backspace') { expression = expression.slice(0, -1); majEcran(expression); }
+      else if (e.key === 'Escape') { expression = ''; exprPrecedente.textContent = ''; majEcran('0'); }
+    });
+  </script>
+
+</body>
+</html>
