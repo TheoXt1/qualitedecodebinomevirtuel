@@ -2,71 +2,183 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculatrice Scientifique</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --surface: #1e1e1e;
+      --btn: #2d2d2d;
+      --btn-hover: #3d3d3d;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --danger: #ef4444;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem 1rem;
+    }
+
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      max-width: 720px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .calculatrice, .historique-panel {
+      background-color: var(--surface);
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .calculatrice { width: 340px; }
+    .historique-panel { flex: 1; min-width: 260px; display: flex; flex-direction: column; }
+
+    h1, h2 { margin-top: 0; font-size: 1.25rem; font-weight: 600; }
+
+    /* Écran d'affichage */
+    #ecran {
+      width: 100%;
+      height: 64px;
+      background-color: var(--bg);
+      color: var(--text);
+      border: 1px solid #333;
+      border-radius: 10px;
+      font-size: 1.75rem;
+      text-align: right;
+      padding: 0 1rem;
+      margin-bottom: 1rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Grille de boutons (remplace le <table>) */
+    .clavier {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      background-color: var(--btn);
+      color: var(--text);
+      border: none;
+      border-radius: 10px;
+      height: 52px;
+      font-size: 1.15rem;
+      cursor: pointer;
+      transition: background-color 0.15s, transform 0.05s;
+    }
+
+    button:hover { background-color: var(--btn-hover); }
+    button:active { transform: scale(0.96); }
+
+    .btn-op { color: #60a5fa; font-weight: 600; }
+    .btn-clear { color: var(--danger); font-weight: 600; }
+    .btn-egal { background-color: var(--accent); font-weight: bold; }
+    .btn-egal:hover { background-color: var(--accent-hover); }
+    .span-2 { grid-column: span 2; }
+
+    /* Section Historique */
+    #historique {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem 0;
+      flex: 1;
+      max-height: 310px;
+      overflow-y: auto;
+    }
+
+    #historique li {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid #2e2e2e;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    #historique li:hover:not(.vide) { background-color: var(--btn); }
+    #historique li.vide { color: var(--text-muted); cursor: default; }
+
+    .btn-reset-hist {
+      width: 100%;
+      height: 40px;
+      font-size: 0.95rem;
+      background-color: transparent;
+      border: 1px solid #3f3f46;
+      color: var(--text-muted);
+    }
+    .btn-reset-hist:hover { border-color: var(--danger); color: var(--danger); background: transparent; }
+  </style>
 </head>
 <body>
 
   <main>
-    <h1>Calculatrice</h1>
+    <!-- Bloc Calculatrice -->
+    <section class="calculatrice" aria-label="Calculatrice">
+      <h1>Calculatrice</h1>
 
-    <!-- Écran d'affichage -->
-    <div>
-      <input type="text" id="ecran" name="ecran" value="0" readonly>
-    </div>
+      <input type="text" id="ecran" name="ecran" value="0" aria-label="Écran de résultat" readonly>
 
-    <br>
+      <div class="clavier" id="clavier">
+        <!-- Fonctions scientifiques -->
+        <button type="button" class="btn-op" data-val="(">(</button>
+        <button type="button" class="btn-op" data-val=")">)</button>
+        <button type="button" class="btn-op" data-action="sqrt">√</button>
+        <button type="button" class="btn-op" data-action="pow2">x²</button>
 
-    <!-- Pavé numérique et opérateurs -->
-    <table>
-      <!-- Nouvelle rangée : fonctions scientifiques -->
-      <tr>
-        <td><button type="button">(</button></td>
-        <td><button type="button">)</button></td>
-        <td><button type="button">√</button></td>
-        <td><button type="button">x²</button></td>
-      </tr>
-      <tr>
-        <td><button type="button">C</button></td>
-        <td><button type="button">CE</button></td>
-        <td><button type="button">%</button></td>
-        <td><button type="button">/</button></td>
-      </tr>
-      <tr>
-        <td><button type="button">7</button></td>
-        <td><button type="button">8</button></td>
-        <td><button type="button">9</button></td>
-        <td><button type="button">*</button></td>
-      </tr>
-      <tr>
-        <td><button type="button">4</button></td>
-        <td><button type="button">5</button></td>
-        <td><button type="button">6</button></td>
-        <td><button type="button">-</button></td>
-      </tr>
-      <tr>
-        <td><button type="button">1</button></td>
-        <td><button type="button">2</button></td>
-        <td><button type="button">3</button></td>
-        <td><button type="button">+</button></td>
-      </tr>
-      <tr>
-        <td colspan="2"><button type="button">0</button></td>
-        <td><button type="button">.</button></td>
-        <td><button type="button">=</button></td>
-      </tr>
-    </table>
+        <!-- Effacement et pourcentage -->
+        <button type="button" class="btn-clear" data-action="clear-all">C</button>
+        <button type="button" class="btn-clear" data-action="backspace">CE</button>
+        <button type="button" class="btn-op" data-val="%">%</button>
+        <button type="button" class="btn-op" data-val="/">÷</button>
 
-    <br>
+        <!-- Pavé numérique -->
+        <button type="button" data-val="7">7</button>
+        <button type="button" data-val="8">8</button>
+        <button type="button" data-val="9">9</button>
+        <button type="button" class="btn-op" data-val="*">×</button>
 
-    <!-- Nouvelle section : Historique des opérations -->
-    <section>
+        <button type="button" data-val="4">4</button>
+        <button type="button" data-val="5">5</button>
+        <button type="button" data-val="6">6</button>
+        <button type="button" class="btn-op" data-val="-">−</button>
+
+        <button type="button" data-val="1">1</button>
+        <button type="button" data-val="2">2</button>
+        <button type="button" data-val="3">3</button>
+        <button type="button" class="btn-op" data-val="+">+</button>
+
+        <button type="button" class="span-2" data-val="0">0</button>
+        <button type="button" data-val=".">.</button>
+        <button type="button" class="btn-egal" data-action="eval">=</button>
+      </div>
+    </section>
+
+    <!-- Bloc Historique -->
+    <section class="historique-panel" aria-label="Historique des opérations">
       <h2>Historique</h2>
       <ul id="historique">
-        <li>Aucun calcul récent</li>
+        <li class="vide">Aucun calcul récent</li>
       </ul>
-      <button type="button">Effacer l'historique</button>
+      <button type="button" class="btn-reset-hist" id="btn-effacer-hist">Effacer l'historique</button>
     </section>
   </main>
 
-</body>
-</html>
+  <script>
+    const ecran = document.getElementById('ecran');
+    const clavier
